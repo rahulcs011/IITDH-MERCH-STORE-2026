@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Merch Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Visitor tracking (Google Analytics 4): replace G-XXXXXXXXXX with your
+       Measurement ID from analytics.google.com, then remove this comment. -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script> -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .container { max-width: 1200px; }
+    .product-card {
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease; border-radius: 12px;
+      overflow: hidden;
+    }
+    .product-card:hover { transform: translateY(-5px); }
+    .cart-icon {
+      position: fixed; top: 1.5rem; right: 1.5rem; z-index: 50; cursor: pointer;
+      background-color: #4338ca; color: white; padding: 0.75rem; border-radius: 9999px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease;
+    }
+    .cart-icon:hover { transform: scale(1.1); }
+    #toast-notification {
+      position: fixed;
+      top: 5rem;
+      right: 1.5rem;
+      z-index: 60;
+      transform: translateY(-20px) scale(0.95);
+      opacity: 0;
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+      pointer-events: none;
+    }
+    #toast-notification.show {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .animate-marquee { animation: marquee 20s linear infinite; }
+    .animate-marquee2 { animation: marquee2 20s linear infinite; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+    }
+    @keyframes marquee2 {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .size-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .size-option {
+      cursor: pointer;
+      border: 2px solid #d1d5db;
+      border-radius: 9999px;
+      min-width: 32px;
+      height: 32px;
+      padding: 0 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    .size-option.selected {
+      border-color: #4338ca;
+      background-color: #4338ca;
+      color: white;
+      transform: scale(1.1);
+    }
+    .color-selector { display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap; }
+    .color-option-wrapper {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .color-option {
+      width: 28px;
+      height: 28px;
+      border-radius: 9999px;
+      border: 2px solid #e5e7eb;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .color-option.selected {
+      border-color: #4338ca;
+      transform: scale(1.2);
+    }
+    #preview-image-slider {
+      display: flex;
+      transition: transform 0.4s ease-in-out;
+    }
+    .slider-image {
+      flex-shrink: 0;
+      width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+    }
+    .preview-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #d1d5db;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+    .dot.active {
+      background-color: #4338ca;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+  <div id="announcement-bar" class="relative flex overflow-x-hidden bg-red-600 text-white">
+    <div id="marquee-1" class="py-2 animate-marquee whitespace-nowrap"></div>
+    <div id="marquee-2" class="absolute top-0 py-2 animate-marquee2 whitespace-nowrap"></div>
+  </div>
+
+  <div class="container mx-auto px-4 md:px-8 py-8">
+    <div id="cart-icon" class="cart-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.158 1.762.704 1.762h10.978c.862 0 1.334-1.132.703-1.762l-2.294-2.293m-4.502-4.502L13 13" />
+      </svg>
+      <span id="cart-item-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+    </div>
+
+    <div id="toast-notification" class="bg-green-500 text-white px-4 py-2 rounded-full shadow-lg">
+      <p id="toast-message" class="text-sm font-semibold"></p>
+    </div>
+
+    <header class="text-center mb-16">
+      <h1 id="store-name" class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4"></h1>
+      <p id="store-tagline" class="text-xl text-gray-600"></p>
+    </header>
+
+    <main id="main-content">
+      <div id="main-view">
+        <section id="menu-section" class="text-center mb-12">
+          <div class="inline-flex rounded-md shadow-sm" role="group">
+            <button id="catalogue-btn" type="button" class="py-3 px-6 text-lg font-medium text-gray-900 bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 hover:text-indigo-700 focus:z-10 focus:ring-2 focus:ring-indigo-700 focus:text-indigo-700">
+              Catalogue
+            </button>
+            <button id="size-chart-btn" type="button" class="py-3 px-6 text-lg font-medium text-gray-900 bg-white rounded-r-lg border-t border-b border-r border-gray-200 hover:bg-gray-100 hover:text-indigo-700 focus:z-10 focus:ring-2 focus:ring-indigo-700 focus:text-indigo-700">
+              Size Chart
+            </button>
+          </div>
+        </section>
+
+        <section id="product-section" class="mb-12">
+          <h2 class="text-4xl font-semibold text-gray-900 mb-8 text-center">Our Collection</h2>
+          <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </section>
+
+        <section id="cart-section" class="bg-white p-6 md:p-10 rounded-2xl shadow-lg mb-12">
+          <h2 class="text-4xl font-semibold text-gray-900 mb-6 text-center">Your Cart</h2>
+          <div id="cart-items" class="space-y-4"></div>
+          <div id="cart-summary" class="flex justify-between items-center text-2xl font-bold mt-8 pt-4 border-t-2 border-gray-200">
+            <span>Total:</span><span id="cart-total"></span>
+          </div>
+          <div class="mt-10 text-center">
+            <button id="checkout-button" class="bg-indigo-600 text-white font-bold py-4 px-10 rounded-full hover:bg-indigo-700 transition duration-300 transform hover:scale-105 text-lg">Proceed to Checkout</button>
+          </div>
+        </section>
+      </div>
+
+      <section id="checkout-section" class="hidden bg-white p-6 md:p-10 rounded-2xl shadow-lg">
+        <h2 class="text-4xl font-semibold text-gray-900 mb-8 text-center">Checkout</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div id="customer-details">
+            <h3 class="text-2xl font-medium mb-6">Student Details</h3>
+            <form id="checkout-form" class="space-y-6">
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                <input type="text" id="name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border" required>
+              </div>
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="user@iitdh.ac.in" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border" required>
+              </div>
+              <div>
+                <label for="roll_no" class="block text-sm font-medium text-gray-700">Roll No.</label>
+                <input type="text" id="roll_no" name="roll_no" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border" required>
+              </div>
+              <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700">WhatsApp No.</label>
+                <input type="tel" id="phone" name="phone" inputmode="numeric" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border" required>
+              </div>
+              <div>
+                <label for="batch_year" class="block text-sm font-medium text-gray-700">Batch Year</label>
+                <select id="batch_year" name="batch_year" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border" required>
+                  <option value="" selected disabled>Select Batch / Program</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                  <option value="Mtech">Mtech</option>
+                  <option value="MS/MSc">MS/MSc</option>
+                  <option value="Phd">Phd</option>
+                </select>
+              </div>
+            </form>
+          </div>
+
+          <div id="payment-details">
+            <h3 class="text-2xl font-medium mb-6">Order Summary &amp; Payment</h3>
+            <div id="checkout-cart-summary" class="bg-gray-50 p-6 rounded-lg mb-8">
+              <h4 class="text-xl font-semibold mb-4">Items:</h4>
+              <div id="checkout-cart-items" class="space-y-3 mb-4"></div>
+
+              <div class="space-y-2 mt-6 pt-4 border-t border-gray-300">
+                <div class="flex justify-between text-lg">
+                  <span>Subtotal:</span><span id="checkout-subtotal"></span>
+                </div>
+                <div class="flex justify-between items-center text-lg">
+                  <span>Discount:</span><span id="checkout-discount" class="text-red-500"></span>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center text-2xl font-bold pt-4 border-t-2 border-gray-400 mt-6">
+                <span>Final Total:</span><span id="checkout-cart-total"></span>
+              </div>
+            </div>
+
+            <div class="mb-8 flex items-end space-x-2">
+              <div class="flex-grow">
+                <label for="coupon-code" class="block text-sm font-medium text-gray-700">Apply Coupon Code</label>
+                <input type="text" id="coupon-code" name="coupon-code" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border">
+              </div>
+              <button id="apply-coupon-button" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300">Apply</button>
+            </div>
+
+            <p class="text-lg mb-6">Please pay the final total using the QR code or UPI ID below, then upload the payment screenshot to place your order.</p>
+            <div class="flex flex-col items-center mb-8">
+              <img id="upi-qr" src="" alt="UPI QR Code" class="w-44 h-auto rounded-lg border-2 border-indigo-500 p-2">
+              <p id="upi-id-text" class="mt-4 font-semibold text-sm sm:text-base md:text-lg lg:text-xl break-words max-w-full"></p>
+            </div>
+
+            <div>
+              <label for="payment-screenshot" class="block text-sm font-medium text-gray-700">Upload Payment Screenshot</label>
+              <input type="file" id="payment-screenshot" name="payment-screenshot" accept="image/*" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+            </div>
+
+            <div class="mt-8 flex justify-between items-center">
+              <button id="back-to-cart-button" class="bg-gray-500 text-white font-bold py-3 px-8 rounded-full hover:bg-gray-600 transition duration-300 transform hover:scale-105">Back to Cart</button>
+              <button id="place-order-button" class="bg-green-600 text-white font-bold py-3 px-8 rounded-full hover:bg-green-700 transition duration-300 transform hover:scale-105">Place Order</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center py-8 mt-16 border-t border-gray-200">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">Contact Us</h2>
+      <p class="text-lg text-gray-600">For any queries, feel free to reach out to us:</p>
+      <div class="mt-4 space-y-2">
+        <p class="text-lg text-gray-800">
+          <strong>WhatsApp:</strong> <a id="footer-whatsapp" href="#" target="_blank" class="text-indigo-600 hover:underline"></a>
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Message box -->
+  <div id="message-box" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white p-8 rounded-xl shadow-xl text-center max-w-sm w-full">
+      <p id="message-text" class="text-xl font-medium mb-6"></p>
+      <button id="close-message" class="bg-indigo-600 text-white py-3 px-8 rounded-full hover:bg-indigo-700 text-lg">OK</button>
+    </div>
+  </div>
+
+  <!-- Image preview modal -->
+  <div id="preview-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white p-6 rounded-xl shadow-xl max-w-2xl w-full">
+      <div class="flex justify-end">
+        <button id="close-preview-modal" class="text-gray-500 hover:text-gray-900 text-3xl font-bold">&times;</button>
+      </div>
+      <div class="relative mb-2">
+        <div id="preview-image-container" class="overflow-hidden">
+          <div id="preview-image-slider"></div>
+        </div>
+        <button id="prev-image" class="absolute left-2 top-1/2 -translate-y-1/2 p-2 text-4xl text-white bg-black bg-opacity-20 rounded-full hover:bg-opacity-50 z-10">&lt;</button>
+        <button id="next-image" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-4xl text-white bg-black bg-opacity-20 rounded-full hover:bg-opacity-50 z-10">&gt;</button>
+      </div>
+      <div id="preview-dots-container" class="preview-dots"></div>
+      <h3 id="preview-title" class="text-xl font-semibold text-center mt-2"></h3>
+    </div>
+  </div>
+
+  <!-- Custom name modal -->
+  <div id="custom-name-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+      <h3 class="text-3xl font-semibold mb-4 text-gray-900">Add Custom Name</h3>
+      <p id="custom-name-hint" class="text-gray-600 mb-6"></p>
+      <label for="modal-custom-name" class="block text-sm font-medium text-gray-700">Name to print (max 20 chars):</label>
+      <input type="text" id="modal-custom-name" maxlength="20" oninput="this.value = this.value.toUpperCase()" class="mt-2 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:border-indigo-500 focus:ring-indigo-500">
+      <div class="mt-8 flex justify-end space-x-4">
+        <button id="cancel-custom-name" class="bg-gray-200 text-gray-700 font-bold py-3 px-6 rounded-full hover:bg-gray-300 transition duration-300">Cancel</button>
+        <button id="save-custom-name" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size chart modal -->
+  <div id="size-chart-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white p-3 rounded-xl shadow-xl max-w-md w-auto mx-4 relative">
+      <button id="close-size-chart-modal" class="absolute -top-3 -right-3 bg-white rounded-full p-1 text-gray-700 hover:text-gray-900 text-3xl font-bold leading-none">&times;</button>
+      <div id="size-chart-content" class="rounded-lg w-full overflow-x-auto"></div>
+    </div>
+  </div>
+
+  <!-- Loading / processing overlay -->
+  <div id="processing-overlay" class="fixed inset-0 bg-indigo-900 bg-opacity-95 hidden items-center justify-center z-50 text-white text-center">
+    <div>
+      <p class="text-3xl font-light mb-4">Placing your order...</p>
+      <p class="text-8xl font-bold animate-pulse">...</p>
+      <p class="text-2xl font-light mt-4">Please do not close this page.</p>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
