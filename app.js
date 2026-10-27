@@ -119,6 +119,21 @@ const getItemPrice = (item) => {
 
 const getCartSubtotal = () => cart.reduce((sum, item) => sum + getItemPrice(item), 0);
 const getCartTotal = () => Math.max(0, getCartSubtotal() - discount);
+const updatePaymentQr = () => {
+  const amount = getCartTotal().toFixed(2);
+  const paymentUrl = new URLSearchParams({
+    pa: cfg.upiId,
+    pn: cfg.storeName,
+    am: amount,
+    cu: "INR",
+    tn: "Merch Order Payment"
+  });
+  const upiUri = `upi://pay?${paymentUrl.toString()}`;
+  const qrImg = document.getElementById("upi-qr");
+  qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
+  qrImg.alt = `UPI payment QR for Rs. ${amount}`;
+  document.getElementById("upi-amount-text").textContent = `Amount to pay: Rs. ${amount}`;
+};
 const getProductOptionName = (product, option) =>
   (product.optionNames && product.optionNames[option]) || option;
 const getProductImages = (product, color, design) =>
@@ -335,6 +350,7 @@ const renderCart = () => {
   checkoutDiscountSpan.textContent = `- Rs. ${discount.toFixed(2)}`;
   checkoutCartTotalSpan.textContent = `Rs. ${getCartTotal().toFixed(2)}`;
   cartItemCount.textContent = cart.length;
+  updatePaymentQr();
 };
 
 const handleAddToCart = (e, parentCard) => {
@@ -642,17 +658,8 @@ const applyStoreConfig = () => {
     document.getElementById("announcement-bar").style.display = "none";
   }
 
-  const qrImg = document.getElementById("upi-qr");
-  if (cfg.qrImage && cfg.qrImage.trim() !== "") {
-    qrImg.src = cfg.qrImage;
-    qrImg.onerror = () => {
-      qrImg.onerror = null;
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent("upi://pay?pa=" + cfg.upiId + "&cu=INR")}`;
-    };
-  } else {
-    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent("upi://pay?pa=" + cfg.upiId + "&cu=INR")}`;
-  }
   document.getElementById("upi-id-text").textContent = "UPI ID: " + cfg.upiId;
+  updatePaymentQr();
 
   const waEl = document.getElementById("footer-whatsapp");
   waEl.href = `https://wa.me/${cfg.whatsapp}`;
