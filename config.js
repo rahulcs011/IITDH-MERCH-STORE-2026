@@ -40,7 +40,6 @@ const STORE_CONFIG = {
   // ---------- Colors ----------
   colorMap: {
     "Black": "#000000",
-    "Black1": "#000000",
     "Navy": "#000080",
     "White": "#FFFFFF",
     "Maroon": "#800000",
@@ -65,12 +64,19 @@ const STORE_CONFIG = {
     {
       id: 2, name: "T-Shirt 2", price: 499, type: "shirt",
       optionLabel: "T-Shirt Design",
-      optionNames: { "Black": "Design 1", "Black1": "Design 2" },
-      sizes: "TEE_SIZES", colors: ["Black", "Black1"],
-      images: {
-        "Black": ["images/tshirt_black_front_premium.jpg", "images/tshirt_black_back_premium.jpg"],
-        "Black1": ["images/tshirt_black_front_premium_2.jpg", "images/tshirt_black_back_premium_2.jpg"],
-      }
+      designs:{
+        "Design 1": {
+          "Black": ["images/tshirt_black_front_premium.jpg", "images/tshirt_black_back_premium.jpg"],
+          "Navy": ["images/hoodie_navy_front.jpg", "images/hoodie_navy_back.jpg"]
+        },
+        "Design 2": {
+          "Black": ["images/tshirt_black_front_premium_2.jpg", "images/tshirt_black_back_premium_2.jpg"]  
+        }
+      sizes: "TEE_SIZES", colors: ["Black", "Navy"],
+      // images: {
+      //   "Black": ["images/tshirt_black_front_premium.jpg", "images/tshirt_black_back_premium.jpg"],
+      //   "Black1": ["images/tshirt_black_front_premium_2.jpg", "images/tshirt_black_back_premium_2.jpg"],
+      // }
     },
     {
       id: 3, name: "Polo T-Shirt", price: 499, type: "shirt",
@@ -95,10 +101,10 @@ const STORE_CONFIG = {
         }
       },
       sizes: "HOODIE_SIZES", colors: ["Black", "Navy"],
-      images: {
-        "Black": ["images/hoodie_black_front.jpg", "images/hoodie_black_back.jpg"],
-        "Navy": ["images/hoodie_navy_front.jpg", "images/hoodie_navy_back.jpg"]
-      }
+      // images: {
+      //   "Black": ["images/hoodie_black_front.jpg", "images/hoodie_black_back.jpg"],
+      //   "Navy": ["images/hoodie_navy_front.jpg", "images/hoodie_navy_back.jpg"]
+      // }
     },
     {
       id: 5, name: "Zipper Hoodie", price: 999, type: "hoodie",
@@ -114,10 +120,10 @@ const STORE_CONFIG = {
         }
       },
       sizes: "HOODIE_SIZES", colors: ["Black", "Navy"],
-      images: {
-        "Black": ["images/zipper_hoodie_black_front.jpg", "images/zipper_hoodie_black_back.jpg"],
-        "Navy": ["images/zipper_hoodie_navy_front.jpg", "images/zipper_hoodie_navy_back.jpg"]
-      }
+      // images: {
+      //   "Black": ["images/zipper_hoodie_black_front.jpg", "images/zipper_hoodie_black_back.jpg"],
+      //   "Navy": ["images/zipper_hoodie_navy_front.jpg", "images/zipper_hoodie_navy_back.jpg"]
+      // }
     },
     {
       id: 6, name: "CS Hoodie", price: 989, type: "hoodie",
