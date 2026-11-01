@@ -66,12 +66,14 @@ const loadCart = () => {
         product.sizes.includes(item.size) &&
         product.colors.includes(item.color) &&
         (!item.design || (product.designs && product.designs[item.design])) &&
-        (!item.customName || (typeof item.customName === "string" && item.customName.length <= 20));
+        (!item.customName || (typeof item.customName === "string" && item.customName.length <= 20)) &&
+        (!item.branchPrint || product.allowsBranchPrint);
     }).map(item => ({
       ...item,
       id: Number(item.id),
       design: item.design || "",
-      customName: !item.customName || item.customName === "N/A" ? null : item.customName
+      customName: !item.customName || item.customName === "N/A" ? null : item.customName,
+      branchPrint: Boolean(item.branchPrint)
     })) : [];
   } catch (e) {
     cart = [];
@@ -114,6 +116,7 @@ const getItemPrice = (item) => {
   let price = product.price;
   if (item.size === "XXL") price += cfg.xxlFee;
   if (item.customName) price += cfg.customNameFee;
+  if (item.branchPrint && product.allowsBranchPrint) price += cfg.branchPrintFee;
   return price;
 };
 
@@ -156,6 +159,8 @@ const updateProductCardState = (card) => {
   const customNameValueEl = card.querySelector(".custom-name-value");
   const customNameValue = customNameValueEl ? customNameValueEl.value : "";
   const wantsCustomName = customNameToggle ? customNameToggle.checked : false;
+  const branchPrintToggle = card.querySelector(".branch-print-toggle");
+  const wantsBranchPrint = branchPrintToggle ? branchPrintToggle.checked : false;
 
   const productImage = card.querySelector(".product-image");
   const selectedImages = getProductImages(product, selectedColor, selectedDesign);
@@ -170,7 +175,8 @@ const updateProductCardState = (card) => {
     item.size === selectedSize &&
     item.color === selectedColor &&
     (item.design || "") === selectedDesign &&
-    (wantsCustomName ? item.customName === customNameValue : !item.customName)
+    (wantsCustomName ? item.customName === customNameValue : !item.customName) &&
+    Boolean(item.branchPrint) === wantsBranchPrint
   );
 
   if (itemInCart) {
@@ -230,6 +236,7 @@ const renderProducts = () => {
             </div>
           </div>
           ${product.allowsCustomName ? `<div class="flex items-center space-x-2 pt-1"><input type="checkbox" id="custom_name_toggle-${product.id}" class="custom-name-toggle rounded text-indigo-600 focus:ring-indigo-500"><label for="custom_name_toggle-${product.id}" class="text-sm font-medium text-gray-700">Add custom name (+Rs. ${cfg.customNameFee})</label><input type="hidden" class="custom-name-value"></div>` : ""}
+          ${product.allowsBranchPrint ? `<div class="flex items-center space-x-2 pt-1"><input type="checkbox" id="branch_print_toggle-${product.id}" class="branch-print-toggle rounded text-indigo-600 focus:ring-indigo-500"><label for="branch_print_toggle-${product.id}" class="text-sm font-medium text-gray-700">Add branch print (+Rs. ${cfg.branchPrintFee})</label></div>` : ""}
         </div>
       </div>
       <button class="add-to-cart-btn mt-4 bg-indigo-600 text-white font-bold py-2.5 px-6 rounded-full hover:bg-indigo-700 transition duration-300">Add to Cart</button>
@@ -298,6 +305,11 @@ function addEventListenersToCards() {
       });
     }
 
+    const branchPrintToggle = card.querySelector(".branch-print-toggle");
+    if (branchPrintToggle) {
+      branchPrintToggle.addEventListener("change", () => updateProductCardState(card));
+    }
+
     card.querySelector(".add-to-cart-btn").addEventListener("click", e => handleAddToCart(e, card));
   });
 }
@@ -318,6 +330,7 @@ const renderCart = () => {
       ].filter(Boolean).join(" - ");
       let itemDetails = `${product.name} - ${optionDetails} (${item.size})`;
       if (item.customName) itemDetails += ` + Custom Name: "${item.customName}"`;
+      if (item.branchPrint) itemDetails += " + Branch Print";
       const cartItem = document.createElement("div");
       cartItem.className = "flex justify-between items-center bg-gray-50 p-4 rounded-lg";
       const itemContent = document.createElement("div");
@@ -362,6 +375,7 @@ const handleAddToCart = (e, parentCard) => {
   const customNameToggle = parentCard.querySelector(".custom-name-toggle");
   const customNameValueEl = parentCard.querySelector(".custom-name-value");
   const customNameValue = customNameValueEl ? customNameValueEl.value : "";
+  const branchPrintToggle = parentCard.querySelector(".branch-print-toggle");
 
   let customName = null;
   if (customNameToggle && customNameToggle.checked) {
@@ -372,7 +386,14 @@ const handleAddToCart = (e, parentCard) => {
     customName = customNameValue.trim();
   }
 
-  cart.push({ id: productId, size, color, design, customName });
+  cart.push({
+    id: productId,
+    size,
+    color,
+    design,
+    customName,
+    branchPrint: Boolean(branchPrintToggle && branchPrintToggle.checked)
+  });
   discount = 0;
   appliedCoupon = "";
   couponCodeInput.value = "";
@@ -508,7 +529,8 @@ const handlePlaceOrder = async event => {
           size: item.size,
           color: getProductOptionName(product, item.color),
           design: item.design || "",
-          customName: item.customName || "N/A"
+          customName: item.customName || "N/A",
+          branchPrint: item.branchPrint ? "Yes" : "No"
         };
       }),
       subtotal: getCartSubtotal(),
