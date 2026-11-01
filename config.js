@@ -25,6 +25,7 @@ const STORE_CONFIG = {
 
   // ---------- Extra charges ----------
   customNameFee: 69,    // Rs. extra for a custom printed name
+  branchPrintFee: 79,   // Rs. extra for a branch print on Hoodie and Zipper Hoodie
   xxlFee: 11,           // Rs. extra for XXL size
 
   // ---------- Contact (footer) ----------
@@ -51,6 +52,7 @@ const STORE_CONFIG = {
   // ---------- Products ----------
   // sizes: "TEE_SIZES", "HOODIE_SIZES" or a custom array like ["Free Size"]
   // type "shirt"/"hoodie" shows the custom-name option; other types hide it.
+  // allowsBranchPrint enables the branch-print option for a product.
   // Put your photo files in the images folder and update the paths here.
   products: [
     {
@@ -83,6 +85,7 @@ const STORE_CONFIG = {
     },
     {
       id: 4, name: "Hoodie", price: 949, type: "hoodie",
+      allowsBranchPrint: true,
       optionLabel: "Hoodie Design",
       designs: {
         "Design 1": {
@@ -102,6 +105,7 @@ const STORE_CONFIG = {
     },
     {
       id: 5, name: "Zipper Hoodie", price: 999, type: "hoodie",
+      allowsBranchPrint: true,
       optionLabel: "Hoodie Design",
       designs: {
         "Design 1": {
