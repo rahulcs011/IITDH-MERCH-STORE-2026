@@ -39,7 +39,7 @@ const STORE_CONFIG = {
     { code: "BASE1",   minItems: 1, type: "flat",    value: 100  },
     { code: "BASE2",   minItems: 1, type: "flat",    value: 200 },
     { code: "BASE3",   minItems: 2, type: "flat",    value: 200  },
-    { code: "BASE4",   minItems: 3, type: "flat",    value: 400 }
+    { code: "BASE4",   minItems: 2, type: "flat",    value: 400 },
   ],
 
   // ---------- Colors ----------
