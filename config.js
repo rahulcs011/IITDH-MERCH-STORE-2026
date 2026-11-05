@@ -36,8 +36,8 @@ const STORE_CONFIG = {
   coupons: [
     { code: "BUY2",   minItems: 2, type: "flat",    value: 50  },
     { code: "BUY3",   minItems: 3, type: "flat",    value: 100 },
-    { code: "BASET",   minItems: 1, type: "flat",    value: 100  },
-    { code: "BASEH",   minItems: 1, type: "flat",    value: 200 },
+    { code: "BASE1",   minItems: 1, type: "flat",    value: 100  },
+    { code: "BASE2",   minItems: 1, type: "flat",    value: 200 },
   ],
 
   // ---------- Colors ----------
