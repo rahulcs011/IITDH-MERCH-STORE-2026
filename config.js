@@ -34,8 +34,8 @@ const STORE_CONFIG = {
   // ---------- Coupon codes ----------
   // type: "flat" (fixed Rs. off) or "percent" (% off). minItems = minimum items in cart.
   coupons: [
-    { code: "BUY2",   minItems: 2, type: "flat",    value: 50  },
-    { code: "BUY3",   minItems: 3, type: "flat",    value: 100 },
+    // { code: "BUY2",   minItems: 2, type: "flat",    value: 50  },
+    // { code: "BUY3",   minItems: 3, type: "flat",    value: 100 },
     { code: "BASE1",   minItems: 1, type: "flat",    value: 100  },
     { code: "BASE2",   minItems: 1, type: "flat",    value: 200 },
     { code: "BASE3",   minItems: 2, type: "flat",    value: 200  },
