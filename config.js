@@ -15,7 +15,7 @@ const STORE_CONFIG = {
   announcement: "Limited period offer - Order now!",   // scrolling red banner ("" to hide)
 
   // ---------- Payment ----------
-  upiId: "9289886267@sbi",        // your UPI ID, shown at checkout
+  upiId: "prajyotsatarde262144@okaxis",        // your UPI ID, shown at checkout
   qrImage: "images/qr.png",     // your UPI QR code image, put the file in the images folder
 
   // ---------- Order submission ----------
